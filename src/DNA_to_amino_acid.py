@@ -37,15 +37,16 @@ AMINO_ACID_TO_DNA = {
     "L": ["CTA", "CTC", "CTG", "CTT", "TTA", "TTG"],
     "M": ["ATG"],
     # "N": ["AAC","AAT"],
-    "P": ["AAC", "AAT", "GAC", "GAT"],
-    "Q": ["AAC", "AAT", "GAC", "GAT"],
-    "R": ["AAC", "AAT", "GAC", "GAT"],
-    "S": ["AAC", "AAT", "GAC", "GAT"],
-    "T": ["AAC", "AAT", "GAC", "GAT"],
-    "V": ["AAC", "AAT", "GAC", "GAT"],
-    "W": ["AAC", "AAT", "GAC", "GAT"],
-    "X": ["AAC", "AAT", "GAC", "GAT"],
-    "Y": ["AAC", "AAT", "GAC", "GAT"]
-    # "Z": ["AAC", "AAT", "GAC", "GAT"]
+    "P": ["CCA", "CCC", "CCG", "CCT"],
+    "Q": ["CAA", "CAG"],
+    "R": ["AGA", "AGG", "CGA", "CGC", "CGG", "CGT"],
+    "S": ["AGC", "AGT", "TCA", "TCC", "TCG", "TCT"],
+    "T": ["ACA", "ACC", "ACG", "ACT"],
+    "V": ["GTA", "GTC", "GTG", "GTT"],
+    "W": ["TGG"],
+    "X": ["NNN"],
+    "Y": ["TAC", "TAT"],
+    # "Z": ["CAA","CAG","GAA","GAG"]
+    "*": ["TAA", "TAG", "TGA"]
 
 }

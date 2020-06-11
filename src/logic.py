@@ -1,19 +1,17 @@
 import time
 import math
-from src.DNA_to_amino_acid import DNA_TO_AMINO_ACID
+from src.DNA_to_amino_acid import DNA_TO_AMINO_ACID, AMINO_ACID_TO_DNA
 
 
 class Logic:
 
-    def __init__(self, input_file="DNA_input.txt"):
-        f = open(input_file, "r")
-        self.seq = f.read()
-        self.seq = self.seq.replace("\n", "")
-        self.seq = self.seq.replace("\r", "")
+    def __init__(self, is_input_from_file=True, input_dna_seq="DNA_input.txt"):
         self.DNAtoAA = DNA_TO_AMINO_ACID
+        self.AMINO_ACID_TO_DNA = AMINO_ACID_TO_DNA
         self.amino_acid_list = []
         self.back_translated_list = []
         self.min_seq = None
+        self.seq = self._get_input_seq(is_input_from_file, input_dna_seq)
 
     def convert_DNA_to_AA(self):
         self.__check_input_divide_by_3()
@@ -75,9 +73,25 @@ class Logic:
         print('//////////////////////////////////////////////////////////////')
 
     def __do_convert_back_to_DNA(self):
+        total_combinations = 1
         for aa in self.min_seq:
-            self.back_translated_list += self.DNAtoAA[aa]
+            total_combinations = len(self.AMINO_ACID_TO_DNA[aa] * total_combinations)
+            self.back_translated_list.append((self.AMINO_ACID_TO_DNA[aa], len(self.AMINO_ACID_TO_DNA[aa])))
+            # self.back_translated_list += self.AMINO_ACID_TO_DNA[aa]
         print(self.back_translated_list)
+        print('The total different DNA sequences that can be back-translated from the AA sequence is:',
+              total_combinations)
+
+    def _get_input_seq(self, is_input_from_file, input_dna_seq):
+        if is_input_from_file:
+            f = open(input_dna_seq, "r")
+            seq = f.read()
+            seq = seq.replace("\n", "")
+            seq = seq.replace("\r", "")
+            return seq
+        else:
+            return input_dna_seq
+
 
 x = Logic()
 x.convert_DNA_to_AA()
