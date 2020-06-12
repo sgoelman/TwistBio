@@ -1,0 +1,2 @@
+('The shortest sequence with a minimum of 20 DNA letters is :', ('MTFVLF*', 7))
+('The total different DNA sequences that can be back-translated from the AA sequence is:', 1152)

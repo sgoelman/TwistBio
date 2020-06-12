@@ -1,11 +1,11 @@
-import time
 
 from src.logic import Logic
 
 
 def main():
     logic = Logic()
-    logic.convert_DNA_to_AA()
+    logic()
+
 
 
 if __name__ == "__main__":
