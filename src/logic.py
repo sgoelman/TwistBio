@@ -8,79 +8,87 @@ class Logic:
     def __init__(self, is_input_from_file=True, input_dna_seq="DNA_input.txt"):
         self.DNAtoAA = DNA_TO_AMINO_ACID
         self.AMINO_ACID_TO_DNA = AMINO_ACID_TO_DNA
-        self.amino_acid_list = []
+        self.amino_acid_output = None
         self.back_translated_list = []
-        self.min_seq = None
+        self.min_seq_length = math.inf
         self.seq = self.__get_input_seq(is_input_from_file, input_dna_seq)
 
     def __call__(self):
-        self.__convert_DNA_to_AA()
-        self.print_aa_list()
-        min_seq = 'The shortest sequence with a minimum of 20 DNA letters is :', self.get_shortest_minimum_20()
-        convert_to_DNA = 'The total different DNA sequences that can be back-translated from the AA sequence is:', self.convert_back_to_DNA()
+        total_time = self.__convert_DNA_to_AA()
+        if self.min_seq_length == math.inf:
+            self.min_seq_length = 0
+        self.write_output(total_time)
+
+    def write_output(self, total_time):
+        convert_to_AA_output_text = 'The shortest amino acid sequence with a minimum of 20 DNA letters is', self.amino_acid_output, 'With the DNA length of', self.min_seq_length * 3
+        convert_to_DNA_output_text = 'The total different DNA sequences that can be back-translated from the AA sequence is:', self.convert_back_to_DNA()
+        total_time_text = 'total translation time:', str(total_time)
         with open('output.txt', 'a') as the_file:
             the_file.truncate(0)
-            the_file.write(repr(min_seq) + '\n')
-            the_file.write(repr(convert_to_DNA))
+            the_file.write(repr(convert_to_AA_output_text) + '\n')
+            the_file.write(repr(convert_to_DNA_output_text) + '\n')
+            the_file.write(repr(total_time_text))
             the_file.close()
 
     def __convert_DNA_to_AA(self):
         self.__check_input_divide_by_3()
         t0 = time.time()
-        self.__do_conversion()
+
+        # with mp.Pool() as pool:
+        #     result=pool.map(self.__do_conversion,self.seq)
+
+        # with mp.Pool() as pool:
+        #     for x in pool.map(self.__do_conversion,self.seq):
+        #         self.amino_acid_list.append(x)
+
+        for x in self.__do_conversion(self.seq):
+            self.amino_acid_output = x
+
+        # self.__do_conversion(self.seq)
+
         t1 = time.time()
         total = t1 - t0
-        print('total translation time:', total)
-        return
+
+        return total
 
     def __check_input_divide_by_3(self):
         while len(self.seq) % 3 != 0:
             print("Error input DNA does not divide by 3 , will remove final char and try again")
             self.seq = self.seq[:-1]
 
-    def __do_conversion(self):
+    def __do_conversion(self, sequence):
         codon_start = False
         current_aa_sequence = ''
-        for i in range(0, len(self.seq), 3):
-            codon = self.seq[i:i + 3]
+        # todo: when I use a stream I don't know its length need to find a better end condition
+        for i in range(0, len(sequence), 3):
+            single_DNA = sequence[i:i + 3]
             try:
-                if self.DNAtoAA[codon] == 'M':
+                if self.DNAtoAA[single_DNA] == 'M':
                     # new codon
                     codon_start = True
-                elif self.DNAtoAA[codon] == '*':
+                elif self.DNAtoAA[single_DNA] == '*':
+                    # to make sure that we already are in a codon
                     if codon_start:
                         # end codon
-                        current_aa_sequence += self.DNAtoAA[codon]
-                        self.amino_acid_list.append((current_aa_sequence, len(current_aa_sequence)))
+                        current_aa_sequence += self.DNAtoAA[single_DNA]
+                        # shortest sequence with a minimum of 20 DNA (7 AA)
+                        if 7 <= len(current_aa_sequence) <= self.min_seq_length:
+                            self.min_seq_length = len(current_aa_sequence)
+                            yield current_aa_sequence
                         codon_start = False
                         current_aa_sequence = ''
+                        # open new process
+                        # t = threading.Thread()
+                        # t.daemon=True
+                        # t.start()
                 if codon_start:
-                    current_aa_sequence += self.DNAtoAA[codon]
+                    current_aa_sequence += self.DNAtoAA[single_DNA]
             except NameError as ne:
                 print(ne)
-                print("Sequence:", codon, " doesn't match a known DNA")
+                print("Sequence:", single_DNA, " doesn't match a known DNA")
                 continue
             except Exception as e:
                 print(e)
-
-    def get_shortest_minimum_20(self):
-        min_seq, min_length = None, math.inf
-        if self.amino_acid_list:
-            for seq, length in self.amino_acid_list:
-                if length >= 7 and length <= min_length:
-                    min_seq = seq
-                    min_length = length
-            self.min_seq = min_seq
-            return min_seq, min_length
-
-    def print_aa_list(self):
-        print('All of the converted DNA to amino acids:')
-        if self.amino_acid_list:
-            for seq in self.amino_acid_list:
-                print(seq)
-            print('//////////////////////////////////////////////////////////////')
-        else:
-            print('There are no legal amino acids')
 
     def convert_back_to_DNA(self):
         print('All of the back-translated from the amino acids sequence to there DNA sequence:')
@@ -88,8 +96,8 @@ class Logic:
 
     def __do_convert_back_to_DNA(self):
         total_combinations = 1
-        if self.min_seq:
-            for aa in self.min_seq:
+        if self.amino_acid_output:
+            for aa in self.amino_acid_output:
                 total_combinations = len(self.AMINO_ACID_TO_DNA[aa] * total_combinations)
                 self.back_translated_list.append((self.AMINO_ACID_TO_DNA[aa], len(self.AMINO_ACID_TO_DNA[aa])))
             print(self.back_translated_list)

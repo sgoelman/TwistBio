@@ -19,6 +19,7 @@ def step_impl(context, DNA):
     """
     logic = Logic(False, DNA)
     logic()
+    print("Test conversion result:" + str(logic.amino_acid_output) + str(logic.min_seq_length))
 
 
 @step('I validate that receive the correct "(.+)"')
