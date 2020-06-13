@@ -1,9 +1,10 @@
+from src.file_reader import FileReader
 from src.logic import Logic
 
 
 def main():
-    logic = Logic(is_input_from_file=True, input_dna_seq='DNA_input.txt')
-    logic()
+    fr=FileReader()
+    fr.read_in_chunks('DNA_input.txt')
 
 
 if __name__ == "__main__":
