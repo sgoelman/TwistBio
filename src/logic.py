@@ -27,35 +27,39 @@ class Logic:
             the_file.write(repr(convert_to_DNA_output_text) + '\n')
             the_file.close()
 
-    def do_conversion(self, sequence):
+    @staticmethod
+    def do_conversion(procnum, return_dict, block):
         codon_start = False
         current_aa_sequence = ''
+        items = []
+        results = dict(min__block_seq_length=math.inf, items=items)
         # todo: when I use a stream I don't know its length need to find a better end condition
-        for i in range(0, len(sequence), 3):
-            single_DNA = sequence[i:i + 3]
+        for i in range(0, len(block), 3):
+            single_DNA = block[i:i + 3]
             try:
-                if self.DNAtoAA[single_DNA] == 'M':
+                if DNA_TO_AMINO_ACID[single_DNA] == 'M':
                     # new codon
                     codon_start = True
-                elif self.DNAtoAA[single_DNA] == '*':
+                elif DNA_TO_AMINO_ACID[single_DNA] == '*':
                     # to make sure that we already are in a codon
                     if codon_start:
                         # end codon
-                        current_aa_sequence += self.DNAtoAA[single_DNA]
+                        current_aa_sequence += DNA_TO_AMINO_ACID[single_DNA]
                         # shortest sequence with a minimum of 20 DNA (7 AA)
-                        if 7 <= len(current_aa_sequence) <= self.min_seq_length:
-                            self.min_seq_length = len(current_aa_sequence)
-                            yield current_aa_sequence
+                        if 7 <= len(current_aa_sequence) <= results.get('min__block_seq_length'):
+                            results['min__block_seq_length'] = len(current_aa_sequence)
+                            items.append(current_aa_sequence)
                         codon_start = False
                         current_aa_sequence = ''
                 if codon_start:
-                    current_aa_sequence += self.DNAtoAA[single_DNA]
+                    current_aa_sequence += DNA_TO_AMINO_ACID[single_DNA]
             except NameError as ne:
                 print(ne)
                 print("Sequence:", single_DNA, " doesn't match a known DNA")
                 continue
             except Exception as e:
                 print(e)
+        return_dict[current_aa_sequence] = results
 
     def convert_back_to_DNA(self):
         total_combinations = 1
@@ -65,5 +69,6 @@ class Logic:
                 self.back_translated_list.append((self.AMINO_ACID_TO_DNA[aa], len(self.AMINO_ACID_TO_DNA[aa])))
             print(self.back_translated_list)
             return total_combinations
-    def wrapper(self,block):
+
+    def wrapper(self, block):
         return list(self.do_conversion(block))

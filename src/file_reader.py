@@ -9,7 +9,7 @@ class FileReader:
         self.file_position = 0
         self.end_of_file = False
 
-    def convert_by_chunks(self, logic, input_dna_file='DNA_input.txt', chunk_size=999):
+    def convert_by_chunks(self, input_dna_file='DNA_input.txt', chunk_size=999):
         self.end_of_file = False
         with open(input_dna_file) as f:
             for block in self.__read_in_chunks(f, chunk_size):
