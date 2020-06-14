@@ -1,6 +1,6 @@
 import math
 import re
-import sys
+import json
 import traceback
 
 from src.DNA_to_amino_acid import DNA_TO_AMINO_ACID, AMINO_ACID_TO_DNA
@@ -35,7 +35,8 @@ class Logic:
     def do_conversion(procnum, return_dict, block):
         codon_start = False
         current_aa_sequence = ''
-        results = {procnum, {2147483647, None}}
+        result_json = Logic.create_result_json(procnum)
+
         for i in range(0, len(block), 3):
             single_DNA = block[i:i + 3]
             try:
@@ -48,10 +49,10 @@ class Logic:
                         # end codon
                         current_aa_sequence += DNA_TO_AMINO_ACID[single_DNA]
                         # shortest sequence with a minimum of 20 DNA (7 AA)
-                        if 7 <= len(current_aa_sequence) <= results:
-                            results = {procnum, [2147483647, None]}
-                            # results[0] = [len(current_aa_sequence), current_aa_sequence]
-                            # results.append(current_aa_sequence)
+                        if 7 <= len(current_aa_sequence) <= result_json[procnum][0]:
+
+                            result_json[procnum] = [len(current_aa_sequence), current_aa_sequence]
+                        # results.append(current_aa_sequence)
                         codon_start = False
                         current_aa_sequence = ''
                 if codon_start:
@@ -63,7 +64,7 @@ class Logic:
             except Exception as e:
                 print('PID ' + str(procnum) + ' Exception for  single_DNA : ' + str(e))
                 print(traceback.print_tb(e.__traceback__))
-        return_dict[procnum] = results
+        return_dict[procnum] = result_json
 
     @staticmethod
     def __remove_backslash(data):
@@ -84,3 +85,8 @@ class Logic:
 
     def wrapper(self, procnum, return_dict, block):
         return list(self.do_conversion(procnum, return_dict, block))
+
+    @staticmethod
+    def create_result_json(procnum):
+        data = {procnum: [2147483647, None]}
+        return json.dumps(data)
