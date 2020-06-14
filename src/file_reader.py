@@ -54,9 +54,9 @@ class FileReader:
             self.end_of_file = True
             print('last Line ' + str(len(line)))
             data = data + line
-            if removed_backslash_data != 0:
+            if len(data) % 3 != 0:
                 # check if we need to remove the last char
-                chars_to_remove = 3 - removed_backslash_data % 3
+                chars_to_remove = len(data) % 3
                 data = data[:-chars_to_remove]
             yield data
 

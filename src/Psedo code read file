@@ -1,0 +1,26 @@
+	1. Read data :
+		a. Read chunk =999
+		b. Read 3 chars:
+		c. Search for * in line:
+			1) If contains '/n' :
+				a) switchCase( ) remove /n
+					a) Update read(1 char)
+					b)  add XX to next to next char:
+
+			XX\N
+			X\NX
+			\NXX
+
+			i. If  not found *:
+				1) Add DNA to chunk
+				2) Continue to search for *
+
+
+
+			ii. Else (FOUND *):
+				1) Add DNA to chunk
+				2) Check if chunk is divided by 3:
+					a)  yield
+                ELSE:
+                    problem with code or EOF
+
