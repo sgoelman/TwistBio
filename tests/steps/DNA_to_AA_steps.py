@@ -17,8 +17,9 @@ def step_impl(context, DNA):
     :type context: behave.runner.Context
     :type DNA - input string  : str
     """
-    logic = Logic(False, DNA)
-    logic()
+    logic = Logic()
+    logic.convert_DNA_to_AA(DNA, False)
+    logic.write_output()
     print("Test conversion result:" + str(logic.amino_acid_output) + str(logic.min_seq_length))
 
 
