@@ -1,4 +1,8 @@
 import math
+import re
+import sys
+import traceback
+
 from src.DNA_to_amino_acid import DNA_TO_AMINO_ACID, AMINO_ACID_TO_DNA
 
 
@@ -31,9 +35,7 @@ class Logic:
     def do_conversion(procnum, return_dict, block):
         codon_start = False
         current_aa_sequence = ''
-        items = []
-        results = dict(min__block_seq_length=math.inf, items=items)
-        # todo: when I use a stream I don't know its length need to find a better end condition
+        results = [int, None]
         for i in range(0, len(block), 3):
             single_DNA = block[i:i + 3]
             try:
@@ -46,9 +48,9 @@ class Logic:
                         # end codon
                         current_aa_sequence += DNA_TO_AMINO_ACID[single_DNA]
                         # shortest sequence with a minimum of 20 DNA (7 AA)
-                        if 7 <= len(current_aa_sequence) <= results.get('min__block_seq_length'):
-                            results['min__block_seq_length'] = len(current_aa_sequence)
-                            items.append(current_aa_sequence)
+                        if 7 <= len(current_aa_sequence) <= results[0](0):
+                            results[0] = [len(current_aa_sequence), current_aa_sequence]
+                            # items.append(current_aa_sequence)
                         codon_start = False
                         current_aa_sequence = ''
                 if codon_start:
@@ -58,8 +60,17 @@ class Logic:
                 print("Sequence:", single_DNA, " doesn't match a known DNA")
                 continue
             except Exception as e:
-                print(e)
-        return_dict[current_aa_sequence] = results
+                print('PID ' + str(procnum) + ' Exception for  single_DNA : ' + str(e))
+                print(traceback.print_tb(e.__traceback__))
+        return_dict[procnum] = results
+
+    @staticmethod
+    def __remove_backslash(data):
+        count = 0
+        (data, qty) = re.subn("\n", "", data)
+        count += qty
+        print('remainder_remove:' + str(count))
+        return data, count
 
     def convert_back_to_DNA(self):
         total_combinations = 1
@@ -70,5 +81,5 @@ class Logic:
             print(self.back_translated_list)
             return total_combinations
 
-    def wrapper(self, block):
-        return list(self.do_conversion(block))
+    def wrapper(self, procnum, return_dict, block):
+        return list(self.do_conversion(procnum, return_dict, block))

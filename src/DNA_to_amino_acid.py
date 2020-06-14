@@ -48,5 +48,4 @@ AMINO_ACID_TO_DNA = {
     "Y": ["TAC", "TAT"],
     # "Z": ["CAA","CAG","GAA","GAG"]
     "*": ["TAA", "TAG", "TGA"]
-
 }
