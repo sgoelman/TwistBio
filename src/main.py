@@ -6,7 +6,8 @@ def main():
     start = default_timer()
     logic = Logic()
     logic.convert_DNA_to_AA('DNA_input.txt')
-    logic.write_output()
+    total_combinations = logic.convert_back_to_DNA()
+    logic.write_output(total_combinations)
     duration = default_timer() - start
     print('Total execution Time is : ' + str(duration))
 

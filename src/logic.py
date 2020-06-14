@@ -1,4 +1,3 @@
-
 import math
 from src.DNA_to_amino_acid import DNA_TO_AMINO_ACID, AMINO_ACID_TO_DNA
 
@@ -12,11 +11,16 @@ class Logic:
         self.back_translated_list = []
         self.min_seq_length = math.inf
 
-    def write_output(self):
+    def write_output(self, total_combinations):
+        """
+        writes the shortest amino acid sequence with a minimum of 20 DNA letters and the  total different DNA
+        sequences that can be back-translated from this sequence :rtype: void
+        """
         if self.min_seq_length == math.inf:
             self.min_seq_length = 0
         convert_to_AA_output_text = 'The shortest amino acid sequence with a minimum of 20 DNA letters is', self.amino_acid_output, 'With the DNA length of', self.min_seq_length * 3
-        convert_to_DNA_output_text = 'The total different DNA sequences that can be back-translated from the AA sequence is:', self.convert_back_to_DNA()
+        convert_to_DNA_output_text = 'The total different DNA sequences that can be back-translated from the AA sequence is:', total_combinations
+
         with open('output.txt', 'a') as the_file:
             the_file.truncate(0)
             the_file.write(repr(convert_to_AA_output_text) + '\n')
@@ -24,15 +28,14 @@ class Logic:
             the_file.close()
 
     def convert_DNA_to_AA(self, input_data, is_input_in_file=True):
+        """
+    updates member self.amino_acid_output with the correct converted amino acids
+        :rtype: void
+        """
         data = self.__get_input_seq(input_data, is_input_in_file)
         self.__check_input_divide_by_3(data)
         for x in self.do_conversion(data):
             self.amino_acid_output = x
-
-    def __check_input_divide_by_3(self, data):
-        while len(data) % 3 != 0:
-            print("Error input DNA does not divide by 3 , will remove final char and try again")
-            data = data[:-1]
 
     def do_conversion(self, data):
         codon_start = False
@@ -53,6 +56,18 @@ class Logic:
             except Exception as e:
                 print(e)
 
+    def convert_back_to_DNA(self):
+        """
+        :return: int - total combinations of back-translated from the amino acids sequence to there DNA sequence
+        """
+        print('All of the back-translated from the amino acids sequence to there DNA sequence:')
+        return self.__do_convert_back_to_DNA()
+
+    def __check_input_divide_by_3(self, data):
+        while len(data) % 3 != 0:
+            print("Error input DNA does not divide by 3 , will remove final char and try again")
+            data = data[:-1]
+
     def __check_if_start_end_AA(self, codon_start, current_aa_sequence, single_DNA):
         if self.DNAtoAA[single_DNA] == 'M':
             # new codon
@@ -70,11 +85,10 @@ class Logic:
                 current_aa_sequence = ''
         return codon_start, current_aa_sequence
 
-    def convert_back_to_DNA(self):
-        print('All of the back-translated from the amino acids sequence to there DNA sequence:')
-        return self.__do_convert_back_to_DNA()
-
     def __do_convert_back_to_DNA(self):
+        """
+        :rtype: int - total combinations of back-translated from the amino acids sequence to there DNA sequence
+        """
         total_combinations = 1
         if self.amino_acid_output:
             for aa in self.amino_acid_output:

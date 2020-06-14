@@ -5,8 +5,8 @@ Feature: DNA to AA Converter  tests
   Scenario Outline: Validate that I will receive correct errors with illegal DNA sequence
     Given I am logged in to application
     When I convert DNA to amino acid translation on "<DNA>" I should
-    Then I validate that receive the correct "<Output shortest sequence>"
-    And I validate that receive the correct "<Output total different combinations>"
+    Then I validate that I receive the correct "<Output shortest sequence>"
+    And I validate that I receive the correct "<Output total different combinations>"
 
     Examples:
       | DNA                                                          | Output shortest sequence                            | Output total different combinations |

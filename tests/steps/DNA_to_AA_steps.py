@@ -19,11 +19,12 @@ def step_impl(context, DNA):
     """
     logic = Logic()
     logic.convert_DNA_to_AA(DNA, False)
-    logic.write_output()
+    total_combinations = logic.convert_back_to_DNA()
+    logic.write_output(total_combinations)
     print("Test conversion result:" + str(logic.amino_acid_output) + str(logic.min_seq_length))
 
 
-@step('I validate that receive the correct "(.+)"')
+@step('I validate that I receive the correct "(.+)"')
 def step_impl(context, output):
     """
     :type context: behave.runner.Context
@@ -33,5 +34,3 @@ def step_impl(context, output):
     with open('output.txt', 'r') as file:
         data = file.read().replace('\n', '')
         assert output in data
-    # with open('E:\TwistBio\output.txt') as f:
-    #     assert output1 in f.read()
