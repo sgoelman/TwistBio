@@ -1,24 +1,16 @@
-import time
+
 import math
 from src.DNA_to_amino_acid import DNA_TO_AMINO_ACID, AMINO_ACID_TO_DNA
 
 
 class Logic:
 
-    # def __init__(self, is_input_from_file=True, input_dna_seq="DNA_input.txt"):
     def __init__(self):
         self.DNAtoAA = DNA_TO_AMINO_ACID
         self.AMINO_ACID_TO_DNA = AMINO_ACID_TO_DNA
         self.amino_acid_output = None
         self.back_translated_list = []
         self.min_seq_length = math.inf
-        # self.seq = self.__get_input_seq(is_input_from_file, input_dna_seq)
-
-    # def __call__(self):
-    #     total_time = self.__convert_DNA_to_AA()
-    #     if self.min_seq_length == math.inf:
-    #         self.min_seq_length = 0
-    #     self.write_output(total_time)
 
     def write_output(self):
         if self.min_seq_length == math.inf:
@@ -48,21 +40,11 @@ class Logic:
         for i in range(0, len(data), 3):
             single_DNA = data[i:i + 3]
             try:
-                if self.DNAtoAA[single_DNA] == 'M':
-                    # new codon
-                    codon_start = True
-                elif self.DNAtoAA[single_DNA] == '*':
-                    # to make sure that we already are in a codon
-                    if codon_start:
-                        # end codon
-                        current_aa_sequence += self.DNAtoAA[single_DNA]
-                        # shortest sequence with a minimum of 20 DNA (7 AA)
-                        if 7 <= len(current_aa_sequence) <= self.min_seq_length:
-                            self.min_seq_length = len(current_aa_sequence)
-                            yield current_aa_sequence
-                        codon_start = False
-                        current_aa_sequence = ''
+                codon_start, current_aa_sequence = yield from self.__check_if_start_end_AA(codon_start,
+                                                                                           current_aa_sequence,
+                                                                                           single_DNA)
                 if codon_start:
+                    # add AA to codon
                     current_aa_sequence += self.DNAtoAA[single_DNA]
             except NameError as ne:
                 print(ne)
@@ -70,6 +52,23 @@ class Logic:
                 continue
             except Exception as e:
                 print(e)
+
+    def __check_if_start_end_AA(self, codon_start, current_aa_sequence, single_DNA):
+        if self.DNAtoAA[single_DNA] == 'M':
+            # new codon
+            codon_start = True
+        elif self.DNAtoAA[single_DNA] == '*':
+            # to make sure that we already are in a codon
+            if codon_start:
+                # end codon
+                current_aa_sequence += self.DNAtoAA[single_DNA]
+                # shortest sequence with a minimum of 20 DNA (7 AA)
+                if 7 <= len(current_aa_sequence) <= self.min_seq_length:
+                    self.min_seq_length = len(current_aa_sequence)
+                    yield current_aa_sequence
+                codon_start = False
+                current_aa_sequence = ''
+        return codon_start, current_aa_sequence
 
     def convert_back_to_DNA(self):
         print('All of the back-translated from the amino acids sequence to there DNA sequence:')

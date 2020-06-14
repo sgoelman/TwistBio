@@ -1,5 +1,4 @@
 from timeit import default_timer
-
 from src.logic import Logic
 
 
