@@ -13,53 +13,40 @@ class Logic:
         self.min_seq_length = math.inf
         self.seq = self.__get_input_seq(is_input_from_file, input_dna_seq)
 
-    def __call__(self):
-        total_time = self.__convert_DNA_to_AA()
-        if self.min_seq_length == math.inf:
-            self.min_seq_length = 0
-        self.write_output(total_time)
+    # def __call__(self):
+    #     total_time = self.__convert_DNA_to_AA()
+    #     if self.min_seq_length == math.inf:
+    #         self.min_seq_length = 0
+    #     self.write_output(total_time)
 
-    def write_output(self, total_time):
+    def write_output(self):
         convert_to_AA_output_text = 'The shortest amino acid sequence with a minimum of 20 DNA letters is', self.amino_acid_output, 'With the DNA length of', self.min_seq_length * 3
         convert_to_DNA_output_text = 'The total different DNA sequences that can be back-translated from the AA sequence is:', self.convert_back_to_DNA()
-        total_time_text = 'total translation time:', str(total_time)
+
         with open('output.txt', 'a') as the_file:
             the_file.truncate(0)
             the_file.write(repr(convert_to_AA_output_text) + '\n')
             the_file.write(repr(convert_to_DNA_output_text) + '\n')
-            the_file.write(repr(total_time_text))
             the_file.close()
 
-    def __convert_DNA_to_AA(self):
-        self.__check_input_divide_by_3()
-        t0 = time.time()
-
-        # with mp.Pool() as pool:
-        #     result=pool.map(self.__do_conversion,self.seq)
-
-        # with mp.Pool() as pool:
-        #     for x in pool.map(self.__do_conversion,self.seq):
-        #         self.amino_acid_list.append(x)
-
-        for x in self.__do_conversion(self.seq):
-            self.amino_acid_output = x
-
-        # self.__do_conversion(self.seq)
-
-        t1 = time.time()
-        total = t1 - t0
-
-        return total
+    # def __convert_DNA_to_AA(self):
+    #     self.__check_input_divide_by_3()
+    #     for x in self.do_conversion(self.seq):
+    #         self.amino_acid_output = x
+    #
+    #     t1 = time.time()
+    #     total = t1 - t0
+    #
+    #     return total
 
     def __check_input_divide_by_3(self):
         while len(self.seq) % 3 != 0:
             print("Error input DNA does not divide by 3 , will remove final char and try again")
             self.seq = self.seq[:-1]
 
-    def __do_conversion(self, sequence):
+    def do_conversion(self, sequence):
         codon_start = False
         current_aa_sequence = ''
-        # todo: when I use a stream I don't know its length need to find a better end condition
         for i in range(0, len(sequence), 3):
             single_DNA = sequence[i:i + 3]
             try:
@@ -77,10 +64,6 @@ class Logic:
                             yield current_aa_sequence
                         codon_start = False
                         current_aa_sequence = ''
-                        # open new process
-                        # t = threading.Thread()
-                        # t.daemon=True
-                        # t.start()
                 if codon_start:
                     current_aa_sequence += self.DNAtoAA[single_DNA]
             except NameError as ne:

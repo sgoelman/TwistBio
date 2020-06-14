@@ -1,9 +1,15 @@
+from timeit import default_timer
+
 from src.logic import Logic
 
 
 def main():
-    logic = Logic(is_input_from_file=True, input_dna_seq='DNA_input.txt')
-    logic()
+    start = default_timer()
+    logic = Logic()
+    logic.do_conversion('DNA_input.txt')
+    logic.write_output()
+    duration = default_timer() - start
+    print('Total execution Time is : ' + str(duration))
 
 
 if __name__ == "__main__":
