@@ -9,85 +9,55 @@ class FileReader:
         self.file_position = 0
         self.end_of_file = False
 
-    def convert_by_chunks(self, input_dna_file='DNA_input.txt', block_size=5001):
+    def convert_by_chunks(self, input_dna_file='DNA_input.txt', block_size=999):
         with open(input_dna_file) as f:
             for block in self.__read_in_chunks(f, block_size):
                 yield block
 
     def __read_in_chunks(self, file_object, block_size):
-        """Generator removes /n and /r
+        """Generator removes /n
          returns blocks that divide by 3 and end with * """
-        line_size = 210
 
         while not self.end_of_file:
-            print('Posission:' + str(self.file_position))
-            file_object.seek(self.file_position)
-            self.file_position = file_object.tell()
             data = file_object.read(block_size)
-            if data == '':
-                print('Reached EOF')
+            data_before_remove_n = data
             data, removed_backslash_data = self.__remove_backslash(data)
-            remainder_backslash_data = removed_backslash_data % 3
-            # made sure that the chunk is divided by 3  after removed n/:
-            # todo: make sure that removed  remainder does't have /n
-            data = data + file_object.read(remainder_backslash_data)
-            print('data size after read chunk ' + str(len(data)))
-            self.file_position = file_object.tell()
-            print('Posission after block size:' + str(self.file_position))
-            line = file_object.read(line_size)
-            self.file_position = file_object.tell()
-            print('Posission after read line' + str(self.file_position))
-            line, remainder_backslash_line = self.__remove_backslash(line)
-            yield from self.check_end_of_file(file_object, line, remainder_backslash_line, block_size, data,
-                                              removed_backslash_data, line_size)
-            yield from self.__get_till_stop_codon(data, line, remainder_backslash_line, file_object)
+            if removed_backslash_data % 3 != 0:
+                # made sure that the chunk is divided by 3  after removed n/:
+                # and add remainder to data
+                data = data + file_object.read(removed_backslash_data % 3)
+            yield from self.check_end_of_file(block_size, data, removed_backslash_data)
+            if self.end_of_file:
+                break
+            yield from self.__get_till_stop_codon(data, file_object)
 
-    def check_end_of_file(self, file_object, line, remainder_backslash_line, block_size, data, removed_backslash_data,
-                          line_size):
-        if len(line) + remainder_backslash_line < line_size or len(data) < block_size - removed_backslash_data:
-            # end of file:
-            if len(line) + remainder_backslash_line < line_size:
-                line = file_object.read(len(line))
-            else:
-                line = 0
-            self.file_position = file_object.tell()
+    def check_end_of_file(self, block_size, data, removed_backslash_data):
+        if len(data) < block_size - removed_backslash_data:
             self.end_of_file = True
-            print('last Line ' + str(len(line)))
-            data = data + line
             if len(data) % 3 != 0:
                 # check if we need to remove the last char
                 chars_to_remove = len(data) % 3
                 data = data[:-chars_to_remove]
             yield data
 
-    def __get_till_stop_codon(self, data, line, remainder_backslash_line, file_object):
-        counter = 0
-        has_m = False
-        for c in range(len(line) + remainder_backslash_line):
-            single_DNA = line[c:c + 3]
-            counter += 3
-            # chunk_position = chunk_size + counter + remainder_backslash_line
-            data = data + single_DNA
+    def __get_till_stop_codon(self, data, file_object):
+        found_end_codon = False
+        while not found_end_codon:
+            single_DNA = file_object.read(3)
             try:
-                # if len(single_DNA) == 3 and DNA_TO_AMINO_ACID[single_DNA] == '*':
-                if DNA_TO_AMINO_ACID[single_DNA] == 'M':
-                    has_m = True
-                if DNA_TO_AMINO_ACID[single_DNA] == '*' and has_m == True:
-                    # found the end of the codon
-                    self.file_position = file_object.tell()
-                    file_object.seek(self.file_position)
-                    print('Counter:' + str(counter))
-                    yield data
-                    break
+                if single_DNA.__contains__("\n"):
+                    single_DNA = self.deal_with_bs_n(file_object, data, single_DNA)
+
+                if DNA_TO_AMINO_ACID[single_DNA] != '*':
+                    data += single_DNA
                 else:
-                    # no * or not divided by 3
-                    if len(single_DNA) < 3:
-                        # reached end of line and a single DNA is less then 3
-                        line = file_object.read(99)
-                        self.file_position = file_object.tell()
-                        print('Posission no * or not divided by 3: ' + str(self.file_position))
-                        # self.file_position = self.file_position + chunk_position - len(
-                        #     single_DNA) + remainder_backslash_line
+                    # found the end of the codon
+                    if len(data) % 3 == 0:
+                        yield data
+                        break
+                    else:
+                        raise ValueError('Error in data not divided by 3 ')
+
             except NameError as ne:
                 print(ne)
                 print("Sequence:", single_DNA, " doesn't match a known DNA")
@@ -103,3 +73,9 @@ class FileReader:
         count += qty
         print('remainder_remove:' + str(count))
         return data, count
+
+    def deal_with_bs_n(self, file_object, data, single_DNA):
+        char_to_add = file_object.read(1)
+        new_DNA = single_DNA.replace("\n", "") + char_to_add
+        data += new_DNA
+        return new_DNA
