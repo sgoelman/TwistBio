@@ -34,12 +34,15 @@ class Logic:
         """
         data = self.__get_input_seq(input_data, is_input_in_file)
         self.__check_input_divide_by_3(data)
+        # todo:check if yield returns 2 val or 1
         for x in self.do_conversion(data):
             self.amino_acid_output = x
 
+    # todo:rename method to update add doc string
     def do_conversion(self, data):
         codon_start = False
         current_aa_sequence = ''
+        # todo:create dna in one line
         for i in range(0, len(data), 3):
             single_DNA = data[i:i + 3]
             try:
@@ -55,7 +58,7 @@ class Logic:
                 continue
             except Exception as e:
                 print(e)
-
+#todo: remove wraper method
     def convert_back_to_DNA(self):
         """
         :return: int - total combinations of back-translated from the amino acids sequence to there DNA sequence
@@ -63,11 +66,13 @@ class Logic:
         print('All of the back-translated from the amino acids sequence to there DNA sequence:')
         return self.__do_convert_back_to_DNA()
 
+    # todo: rename method fix_input
     def __check_input_divide_by_3(self, data):
         while len(data) % 3 != 0:
             print("Error input DNA does not divide by 3 , will remove final char and try again")
             data = data[:-1]
 
+    # todo: rename method create_legal_codon
     def __check_if_start_end_AA(self, codon_start, current_aa_sequence, single_DNA):
         if self.DNAtoAA[single_DNA] == 'M':
             # new codon
@@ -75,7 +80,7 @@ class Logic:
         elif self.DNAtoAA[single_DNA] == '*':
             # to make sure that we already are in a codon
             if codon_start:
-                # end codon
+                # end codon *
                 current_aa_sequence += self.DNAtoAA[single_DNA]
                 # shortest sequence with a minimum of 20 DNA (7 AA)
                 if 7 <= len(current_aa_sequence) <= self.min_seq_length:
@@ -99,10 +104,8 @@ class Logic:
 
     def __get_input_seq(self, input_dna_seq, is_input_in_file=True):
         if is_input_in_file:
-            f = open(input_dna_seq, "r")
-            seq = f.read()
-            seq = seq.replace("\n", "")
-            seq = seq.replace("\r", "")
-            return seq
+            with open(input_dna_seq, 'r') as file:
+                data = file.read().replace('\n', '')
+            return data
         else:
             return input_dna_seq
