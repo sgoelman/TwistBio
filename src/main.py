@@ -8,7 +8,6 @@ import time
 def worker(procnum, return_dict, block):
     print('PID:' + str(procnum) + " Block data: " + block)
     res = Logic.do_conversion(procnum, return_dict, block)
-    # res = Logic.do_conversion(procnum, block)
     print(res)
 
 

@@ -35,7 +35,7 @@ class Logic:
     def do_conversion(procnum, return_dict, block):
         codon_start = False
         current_aa_sequence = ''
-        results = [int, None]
+        results = {procnum, {2147483647, None}}
         for i in range(0, len(block), 3):
             single_DNA = block[i:i + 3]
             try:
@@ -48,9 +48,10 @@ class Logic:
                         # end codon
                         current_aa_sequence += DNA_TO_AMINO_ACID[single_DNA]
                         # shortest sequence with a minimum of 20 DNA (7 AA)
-                        if 7 <= len(current_aa_sequence) <= results[0](0):
-                            results[0] = [len(current_aa_sequence), current_aa_sequence]
-                            # items.append(current_aa_sequence)
+                        if 7 <= len(current_aa_sequence) <= results:
+                            results = {procnum, [2147483647, None]}
+                            # results[0] = [len(current_aa_sequence), current_aa_sequence]
+                            # results.append(current_aa_sequence)
                         codon_start = False
                         current_aa_sequence = ''
                 if codon_start:
