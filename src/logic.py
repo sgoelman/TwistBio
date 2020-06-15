@@ -70,14 +70,6 @@ class Logic:
             the_file.close()
 
     @staticmethod
-    def __remove_backslash(data):
-        count = 0
-        (data, qty) = re.subn("\n", "", data)
-        count += qty
-        print('remainder_remove:' + str(count))
-        return data, count
-
-    @staticmethod
     def get_total_combinations(min_dna_seq):
         if min_dna_seq != None:
             total_combinations = 1

@@ -39,4 +39,3 @@ def step_impl(context,file_name):
     """
     main(file_name)
 
-    # 'TGCTTATGAAAATTTTAATCTCCCAGGTAACAAACCAACCAACTTTCGATCTCTTGTAGA"'

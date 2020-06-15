@@ -71,7 +71,6 @@ class FileReader:
         count = 0
         (data, qty) = re.subn("\n", "", data)
         count += qty
-        print('remainder_remove:' + str(count))
         return data, count
 
     def deal_with_bs_n(self, file_object, data, single_DNA):
