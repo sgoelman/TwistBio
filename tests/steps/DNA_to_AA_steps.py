@@ -18,7 +18,7 @@ def step_impl(context, DNA):
     :type DNA - input string  : str
     """
     logic = Logic()
-    logic.convert_DNA_to_AA(DNA, False)
+    logic.get_min_aa(DNA, False)
     total_combinations = logic.convert_back_to_DNA()
     logic.write_output(total_combinations)
     print("Test conversion result:" + str(logic.amino_acid_output) + str(logic.min_seq_length))

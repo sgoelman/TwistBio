@@ -27,28 +27,31 @@ class Logic:
             the_file.write(repr(convert_to_DNA_output_text) + '\n')
             the_file.close()
 
-    def convert_DNA_to_AA(self, input_data, is_input_in_file=True):
+    def get_min_aa(self, input_data, is_input_in_file=True):
         """
     updates member self.amino_acid_output with the correct converted amino acids
         :rtype: void
         """
         data = self.__get_input_seq(input_data, is_input_in_file)
-        self.__check_input_divide_by_3(data)
-        # todo:check if yield returns 2 val or 1
-        for x in self.do_conversion(data):
+        data = self.__fix_input(data)
+        # gets min amino acid min values final value is the min or equal to the min
+        for x in self.get_aa_codon(data):
             self.amino_acid_output = x
 
-    # todo:rename method to update add doc string
-    def do_conversion(self, data):
+    def get_aa_codon(self, data):
+        """
+        method will get all min amino acid codons - final codons is with min length
+        :rtype: str
+        """
         codon_start = False
         current_aa_sequence = ''
-        # todo:create dna in one line
+        # big for loop for all data , jumps by 3
         for i in range(0, len(data), 3):
             single_DNA = data[i:i + 3]
             try:
-                codon_start, current_aa_sequence = yield from self.__check_if_start_end_AA(codon_start,
-                                                                                           current_aa_sequence,
-                                                                                           single_DNA)
+                codon_start, current_aa_sequence = yield from self.__convert_dna_to_legal_codon(codon_start,
+                                                                                                current_aa_sequence,
+                                                                                                single_DNA)
                 if codon_start:
                     # add AA to codon
                     current_aa_sequence += self.DNAtoAA[single_DNA]
@@ -58,22 +61,14 @@ class Logic:
                 continue
             except Exception as e:
                 print(e)
-#todo: remove wraper method
-    def convert_back_to_DNA(self):
-        """
-        :return: int - total combinations of back-translated from the amino acids sequence to there DNA sequence
-        """
-        print('All of the back-translated from the amino acids sequence to there DNA sequence:')
-        return self.__do_convert_back_to_DNA()
 
-    # todo: rename method fix_input
-    def __check_input_divide_by_3(self, data):
+    def __fix_input(self, data):
         while len(data) % 3 != 0:
             print("Error input DNA does not divide by 3 , will remove final char and try again")
             data = data[:-1]
+        return data
 
-    # todo: rename method create_legal_codon
-    def __check_if_start_end_AA(self, codon_start, current_aa_sequence, single_DNA):
+    def __convert_dna_to_legal_codon(self, codon_start, current_aa_sequence, single_DNA):
         if self.DNAtoAA[single_DNA] == 'M':
             # new codon
             codon_start = True
@@ -90,10 +85,12 @@ class Logic:
                 current_aa_sequence = ''
         return codon_start, current_aa_sequence
 
-    def __do_convert_back_to_DNA(self):
+    def convert_back_to_DNA(self):
         """
         :rtype: int - total combinations of back-translated from the amino acids sequence to there DNA sequence
+        also prints all possible aa values
         """
+        print('All of the back-translated from the amino acids sequence to there DNA sequence:')
         total_combinations = 1
         if self.amino_acid_output:
             for aa in self.amino_acid_output:
