@@ -32,7 +32,7 @@ class Logic:
     updates member self.amino_acid_output with the correct converted amino acids
         :rtype: void
         """
-        data = self.__get_input_seq(input_data, is_input_in_file)
+        data = self.__replace_backslash_n(input_data, is_input_in_file)
         data = self.__fix_input(data)
         # gets min amino acid min values final value is the min or equal to the min
         for x in self.get_aa_codon(data):
@@ -99,7 +99,7 @@ class Logic:
             print(self.back_translated_list)
             return total_combinations
 
-    def __get_input_seq(self, input_dna_seq, is_input_in_file=True):
+    def __replace_backslash_n(self, input_dna_seq, is_input_in_file=True):
         if is_input_in_file:
             with open(input_dna_seq, 'r') as file:
                 data = file.read().replace('\n', '')
