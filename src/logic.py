@@ -7,7 +7,7 @@ from src.DNA_to_amino_acid import DNA_TO_AMINO_ACID, AMINO_ACID_TO_DNA
 class Logic:
 
     @staticmethod
-    def do_conversion(procnum, return_dict, block):
+    def get_aa_codon(procnum, return_dict, block):
         codon_start = False
         current_aa_sequence = ''
         max_int = 2147483647
@@ -17,22 +17,8 @@ class Logic:
         for i in range(0, len(block), 3):
             single_DNA = block[i:i + 3]
             try:
-                if DNA_TO_AMINO_ACID[single_DNA] == 'M':
-                    # new codon
-                    codon_start = True
-                elif DNA_TO_AMINO_ACID[single_DNA] == '*':
-                    # to make sure that we already are in a codon
-                    if codon_start:
-                        # end codon
-                        current_aa_sequence += DNA_TO_AMINO_ACID[single_DNA]
-                        for key in result_json[procnum]:
-                            if 7 <= len(current_aa_sequence) < min_seq:
-                                min_seq = len(current_aa_sequence)
-                                result_json[procnum] = {len(current_aa_sequence): current_aa_sequence}
-                            codon_start = False
-                            current_aa_sequence = ''
-                if codon_start:
-                    current_aa_sequence += DNA_TO_AMINO_ACID[single_DNA]
+                Logic.__convert_dna_to_legal_codon(codon_start, current_aa_sequence, min_seq, procnum, result_json,
+                                                   single_DNA)
             except NameError as ne:
                 print(ne)
                 print("Sequence:", single_DNA, " doesn't match a known DNA")
@@ -41,6 +27,25 @@ class Logic:
                 print('PID ' + str(procnum) + ' Exception for  single_DNA : ' + str(e))
                 print(traceback.print_tb(e.__traceback__))
         return_dict[procnum] = result_json
+
+    @staticmethod
+    def __convert_dna_to_legal_codon(codon_start, current_aa_sequence, min_seq, procnum, result_json, single_DNA):
+        if DNA_TO_AMINO_ACID[single_DNA] == 'M':
+            # new codon
+            codon_start = True
+        elif DNA_TO_AMINO_ACID[single_DNA] == '*':
+            # to make sure that we already are in a codon
+            if codon_start:
+                # end codon
+                current_aa_sequence += DNA_TO_AMINO_ACID[single_DNA]
+                for key in result_json[procnum]:
+                    if 7 <= len(current_aa_sequence) < min_seq:
+                        min_seq = len(current_aa_sequence)
+                        result_json[procnum] = {len(current_aa_sequence): current_aa_sequence}
+                    codon_start = False
+                    current_aa_sequence = ''
+        if codon_start:
+            current_aa_sequence += DNA_TO_AMINO_ACID[single_DNA]
 
     @staticmethod
     def get_min_seq(return_dict):
@@ -70,7 +75,7 @@ class Logic:
             the_file.close()
 
     @staticmethod
-    def get_total_combinations(min_dna_seq):
+    def convert_back_to_DNA(min_dna_seq):
         if min_dna_seq != None:
             total_combinations = 1
             back_translated_list = []
@@ -82,4 +87,4 @@ class Logic:
         return None
 
     def wrapper(self, procnum, return_dict, block):
-        return list(self.do_conversion(procnum, return_dict, block))
+        return list(self.get_aa_codon(procnum, return_dict, block))

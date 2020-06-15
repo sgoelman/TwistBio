@@ -9,12 +9,15 @@ class FileReader:
         self.file_position = 0
         self.end_of_file = False
 
-    def convert_by_chunks(self, input_dna_file='DNA_input.txt', block_size=9999):
+    def read_in_blocks(self, input_dna_file='DNA_input.txt', block_size=6000000):
+        if block_size % 3 != 0:
+            # multi-algo is dependent on a block size that is mod 3 equals zero
+            block_size = block_size - block_size % 3
         with open(input_dna_file) as f:
-            for block in self.__read_in_chunks(f, block_size):
+            for block in self.__get_blocks(f, block_size):
                 yield block
 
-    def __read_in_chunks(self, file_object, block_size):
+    def __get_blocks(self, file_object, block_size):
         """Generator removes /n
          returns blocks that divide by 3 and end with * """
 
@@ -26,12 +29,12 @@ class FileReader:
                 # made sure that the chunk is divided by 3  after removed n/:
                 # and add remainder to data
                 data = data + file_object.read(removed_backslash_data % 3)
-            yield from self.check_end_of_file(block_size, data, removed_backslash_data)
+            yield from self.__check_end_of_file(block_size, data, removed_backslash_data)
             if self.end_of_file:
                 break
             yield from self.__get_till_stop_codon(data, file_object)
 
-    def check_end_of_file(self, block_size, data, removed_backslash_data):
+    def __check_end_of_file(self, block_size, data, removed_backslash_data):
         if len(data) < block_size - removed_backslash_data:
             self.end_of_file = True
             if len(data) % 3 != 0:
@@ -46,7 +49,7 @@ class FileReader:
             single_DNA = file_object.read(3)
             try:
                 if single_DNA.__contains__("\n"):
-                    single_DNA = self.deal_with_bs_n(file_object, data, single_DNA)
+                    single_DNA = self.__replace_backslash_n(file_object, data, single_DNA)
 
                 if DNA_TO_AMINO_ACID[single_DNA] != '*':
                     data += single_DNA
@@ -73,7 +76,8 @@ class FileReader:
         count += qty
         return data, count
 
-    def deal_with_bs_n(self, file_object, data, single_DNA):
+    @staticmethod
+    def __replace_backslash_n(file_object, data, single_DNA):
         char_to_add = file_object.read(1)
         new_DNA = single_DNA.replace("\n", "") + char_to_add
         data += new_DNA
