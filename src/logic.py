@@ -1,6 +1,4 @@
-import math
 import re
-import json
 import traceback
 
 from src.DNA_to_amino_acid import DNA_TO_AMINO_ACID, AMINO_ACID_TO_DNA
@@ -8,23 +6,14 @@ from src.DNA_to_amino_acid import DNA_TO_AMINO_ACID, AMINO_ACID_TO_DNA
 
 class Logic:
 
-    def __init__(self):
-        self.DNAtoAA = DNA_TO_AMINO_ACID
-        self.AMINO_ACID_TO_DNA = AMINO_ACID_TO_DNA
-        self.amino_acid_output = None
-        self.back_translated_list = []
-        self.min_seq_length = math.inf
-
-    # def __call__(self):
-    #     # total_time = self.__convert_DNA_to_AA()
-    #
-
-    def write_output(self):
-        if self.min_seq_length == math.inf:
-            self.min_seq_length = 0
-        self.write_output()
-        convert_to_AA_output_text = 'The shortest amino acid sequence with a minimum of 20 DNA letters is', self.amino_acid_output, 'With the DNA length of', self.min_seq_length * 3
-        convert_to_DNA_output_text = 'The total different DNA sequences that can be back-translated from the AA sequence is:', self.convert_back_to_DNA()
+    @staticmethod
+    def write_output(min_amino_acid, total_combinations):
+        max_int = 2147483647
+        if len(min_amino_acid) == max_int:
+            min_seq_length = 0
+        convert_to_AA_output_text = 'The shortest amino acid sequence with a minimum of 20 DNA letters is', min_amino_acid, 'With the DNA length of', len(
+            min_amino_acid) * 3
+        convert_to_DNA_output_text = 'The total different DNA sequences that can be back-translated from the AA sequence is:', total_combinations
         with open('output.txt', 'a') as the_file:
             the_file.truncate(0)
             the_file.write(repr(convert_to_AA_output_text) + '\n')
@@ -68,6 +57,20 @@ class Logic:
         return_dict[procnum] = result_json
 
     @staticmethod
+    def get_min_seq(return_dict):
+        a = return_dict.values()
+        max_int = 2147483647
+        new = (max_int, None)
+        for p in return_dict.values():
+            for key, val in p.items():
+                for key, val in val.items():
+                    if key < max_int:
+                        new = (key, val)
+                        max_int = key
+        min_seq = new[1]
+        return min_seq
+
+    @staticmethod
     def __remove_backslash(data):
         count = 0
         (data, qty) = re.subn("\n", "", data)
@@ -75,14 +78,15 @@ class Logic:
         print('remainder_remove:' + str(count))
         return data, count
 
-    def convert_back_to_DNA(self):
+    @staticmethod
+    def get_total_combinations(min_dna_seq):
         total_combinations = 1
-        if self.amino_acid_output:
-            for aa in self.amino_acid_output:
-                total_combinations = len(self.AMINO_ACID_TO_DNA[aa] * total_combinations)
-                self.back_translated_list.append((self.AMINO_ACID_TO_DNA[aa], len(self.AMINO_ACID_TO_DNA[aa])))
-            print(self.back_translated_list)
-            return total_combinations
+        back_translated_list = []
+        for aa in min_dna_seq:
+            total_combinations = len(AMINO_ACID_TO_DNA[aa] * total_combinations)
+            back_translated_list.append((AMINO_ACID_TO_DNA[aa], len(AMINO_ACID_TO_DNA[aa])))
+        print(back_translated_list)
+        return total_combinations
 
     def wrapper(self, procnum, return_dict, block):
         return list(self.do_conversion(procnum, return_dict, block))

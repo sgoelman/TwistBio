@@ -1,3 +1,5 @@
+import traceback
+
 from src.file_reader import FileReader
 from src.logic import Logic
 import multiprocessing
@@ -10,53 +12,31 @@ def worker(procnum, return_dict, block):
     return Logic.do_conversion(procnum, return_dict, block)
 
 
+def main(file_name):
+    try:
+        t0 = time.time()
+        file_reader = FileReader()
+        min_dns_dict = run_multiprocess_conversion(file_reader, file_name)
+        min_dna_seq = Logic.get_min_seq(min_dns_dict)
+        aa_combinations = Logic.get_total_combinations(min_dna_seq)
+        Logic.write_output(min_dna_seq, aa_combinations)
+    except Exception as e:
+        print('Exception in main: ' + str(e))
+        print(traceback.print_tb(e.__traceback__))
 
-def main():
-    t0 = time.time()
-    logic = Logic()
-    file_reader = FileReader()
+def run_multiprocess_conversion(file_reader, file_name):
     manager = multiprocessing.Manager()
     return_dict = manager.dict()
     jobs = []
-    for threadId, block in enumerate(file_reader.convert_by_chunks()):
+    for threadId, block in enumerate(file_reader.convert_by_chunks(file_name)):
         p = multiprocessing.Process(target=worker, args=(threadId, return_dict, block))
         jobs.append(p)
         p.start()
-
     for proc in jobs:
         proc.join()
-    print(return_dict.values())
-    # for p in return_dict.values()
-
+    return return_dict
 
 
 if __name__ == "__main__":
-    main()
+    main('DNA_input.txt')
 
-#
-#
-# def main():
-#     try:
-#         t0 = time.time()
-#         logic = Logic()
-#         apply_async_with_callback(logic)
-#         logic.convert_back_to_DNA()
-#         logic.write_output()
-#
-#         t1 = time.time()
-#         total = t1 - t0
-#         print('total translation time:', str(total))
-#     except Exception as e:
-#         print(e)
-#
-#
-# def collect_results(lst):
-#     results.extend(lst)
-#
-#
-# def apply_async_with_callback(logic):
-#     file_reader = FileReader()
-#     pool = mp.Pool()
-#     for block in file_reader.convert_by_chunks(logic):
-#         pool.apply_async(logic.wrapper, args=(block),
-#                          callback=collect_results)

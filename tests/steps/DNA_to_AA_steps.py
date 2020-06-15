@@ -1,36 +1,42 @@
 from behave import *
 
 from src.logic import Logic
+from src.main import main
 
 use_step_matcher("re")
 
 
-@given("I am logged in to application")
-def step_impl(context):
-    # this is not an app that is why I did not implement
-    pass
-
-
-@when('I convert DNA to amino acid translation on "(?P<DNA>.+)" I should')
-def step_impl(context, DNA):
-    """
-    :type context: behave.runner.Context
-    :type DNA - input string  : str
-    """
-    logic = Logic(False, DNA)
-    logic()
-    print("Test conversion result:" + str(logic.amino_acid_output) + str(logic.min_seq_length))
-
-
-@step('I validate that receive the correct "(.+)"')
-def step_impl(context, output):
+# in file "test.txt""
+@step("""I validate that receive the correct "(.+)" in "(.+)" file""")
+def step_impl(context, output, file_name):
     """
     :type context: behave.runner.Context
     :type output - the required file output : str
     """
 
-    with open('output.txt', 'r') as file:
+    with open(file_name, 'r') as file:
         data = file.read().replace('\n', '')
+        file.close()
         assert output in data
-    # with open('E:\TwistBio\output.txt') as f:
-    #     assert output1 in f.read()
+
+
+@given("""I create a test file "(.+)" with the"(?P<DNA>.+)".""")
+def step_impl(context, file_name, DNA):
+    """
+    :type context: behave.runner.Context
+    :type DNA: str
+    """
+    with open(file_name, "a") as myfile:
+        myfile.truncate(0)
+        myfile.write(DNA)
+    myfile.close()
+
+
+@when('I convert DNA to amino acid translation from "(.+)" file')
+def step_impl(context,file_name):
+    """
+    :type context: behave.runner.Context
+    """
+    main(file_name)
+
+    # 'TGCTTATGAAAATTTTAATCTCCCAGGTAACAAACCAACCAACTTTCGATCTCTTGTAGA"'
