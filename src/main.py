@@ -7,8 +7,8 @@ import time
 
 def worker(procnum, return_dict, block):
     print('PID:' + str(procnum) + " Block data: " + block)
-    res = Logic.do_conversion(procnum, return_dict, block)
-    print(res)
+    return Logic.do_conversion(procnum, return_dict, block)
+
 
 
 def main():
@@ -19,7 +19,6 @@ def main():
     return_dict = manager.dict()
     jobs = []
     for threadId, block in enumerate(file_reader.convert_by_chunks()):
-        # p = multiprocessing.Process(target=worker, args=(threadId, block))
         p = multiprocessing.Process(target=worker, args=(threadId, return_dict, block))
         jobs.append(p)
         p.start()
@@ -27,6 +26,8 @@ def main():
     for proc in jobs:
         proc.join()
     print(return_dict.values())
+    # for p in return_dict.values()
+
 
 
 if __name__ == "__main__":

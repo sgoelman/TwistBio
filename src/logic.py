@@ -35,7 +35,9 @@ class Logic:
     def do_conversion(procnum, return_dict, block):
         codon_start = False
         current_aa_sequence = ''
-        result_json = Logic.create_result_json(procnum)
+        max_int = 2147483647
+        min_seq = max_int
+        result_json = {procnum: {max_int: None}}
 
         for i in range(0, len(block), 3):
             single_DNA = block[i:i + 3]
@@ -48,13 +50,12 @@ class Logic:
                     if codon_start:
                         # end codon
                         current_aa_sequence += DNA_TO_AMINO_ACID[single_DNA]
-                        # shortest sequence with a minimum of 20 DNA (7 AA)
-                        if 7 <= len(current_aa_sequence) <= result_json[procnum][0]:
-
-                            result_json[procnum] = [len(current_aa_sequence), current_aa_sequence]
-                        # results.append(current_aa_sequence)
-                        codon_start = False
-                        current_aa_sequence = ''
+                        for key in result_json[procnum]:
+                            if 7 <= len(current_aa_sequence) < min_seq:
+                                min_seq = len(current_aa_sequence)
+                                result_json[procnum] = {len(current_aa_sequence): current_aa_sequence}
+                            codon_start = False
+                            current_aa_sequence = ''
                 if codon_start:
                     current_aa_sequence += DNA_TO_AMINO_ACID[single_DNA]
             except NameError as ne:
@@ -85,8 +86,3 @@ class Logic:
 
     def wrapper(self, procnum, return_dict, block):
         return list(self.do_conversion(procnum, return_dict, block))
-
-    @staticmethod
-    def create_result_json(procnum):
-        data = {procnum: [2147483647, None]}
-        return json.dumps(data)
