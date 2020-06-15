@@ -7,20 +7,6 @@ from src.DNA_to_amino_acid import DNA_TO_AMINO_ACID, AMINO_ACID_TO_DNA
 class Logic:
 
     @staticmethod
-    def write_output(min_amino_acid, total_combinations):
-        max_int = 2147483647
-        if len(min_amino_acid) == max_int:
-            min_seq_length = 0
-        convert_to_AA_output_text = 'The shortest amino acid sequence with a minimum of 20 DNA letters is', min_amino_acid, 'With the DNA length of', len(
-            min_amino_acid) * 3
-        convert_to_DNA_output_text = 'The total different DNA sequences that can be back-translated from the AA sequence is:', total_combinations
-        with open('output.txt', 'a') as the_file:
-            the_file.truncate(0)
-            the_file.write(repr(convert_to_AA_output_text) + '\n')
-            the_file.write(repr(convert_to_DNA_output_text) + '\n')
-            the_file.close()
-
-    @staticmethod
     def do_conversion(procnum, return_dict, block):
         codon_start = False
         current_aa_sequence = ''
@@ -71,6 +57,19 @@ class Logic:
         return min_seq
 
     @staticmethod
+    def write_output(min_amino_acid, total_combinations):
+        min_seq_length = 0
+        if min_amino_acid != None:
+            min_seq_length = len(min_amino_acid) * 3
+        convert_to_AA_output_text = 'The shortest amino acid sequence with a minimum of 20 DNA letters is', min_amino_acid, 'With the DNA length of', min_seq_length
+        convert_to_DNA_output_text = 'The total different DNA sequences that can be back-translated from the AA sequence is:', total_combinations
+        with open('output.txt', 'a') as the_file:
+            the_file.truncate(0)
+            the_file.write(repr(convert_to_AA_output_text) + '\n')
+            the_file.write(repr(convert_to_DNA_output_text) + '\n')
+            the_file.close()
+
+    @staticmethod
     def __remove_backslash(data):
         count = 0
         (data, qty) = re.subn("\n", "", data)
@@ -80,13 +79,15 @@ class Logic:
 
     @staticmethod
     def get_total_combinations(min_dna_seq):
-        total_combinations = 1
-        back_translated_list = []
-        for aa in min_dna_seq:
-            total_combinations = len(AMINO_ACID_TO_DNA[aa] * total_combinations)
-            back_translated_list.append((AMINO_ACID_TO_DNA[aa], len(AMINO_ACID_TO_DNA[aa])))
-        print(back_translated_list)
-        return total_combinations
+        if min_dna_seq != None:
+            total_combinations = 1
+            back_translated_list = []
+            for aa in min_dna_seq:
+                total_combinations = len(AMINO_ACID_TO_DNA[aa] * total_combinations)
+                back_translated_list.append((AMINO_ACID_TO_DNA[aa], len(AMINO_ACID_TO_DNA[aa])))
+            print(back_translated_list)
+            return total_combinations
+        return None
 
     def wrapper(self, procnum, return_dict, block):
         return list(self.do_conversion(procnum, return_dict, block))
