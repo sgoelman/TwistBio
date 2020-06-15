@@ -17,8 +17,22 @@ class Logic:
         for i in range(0, len(block), 3):
             single_DNA = block[i:i + 3]
             try:
-                Logic.__convert_dna_to_legal_codon(codon_start, current_aa_sequence, min_seq, procnum, result_json,
-                                                   single_DNA)
+                if DNA_TO_AMINO_ACID[single_DNA] == 'M':
+                    # new codon
+                    codon_start = True
+                elif DNA_TO_AMINO_ACID[single_DNA] == '*':
+                    # to make sure that we already are in a codon
+                    if codon_start:
+                        # end codon
+                        current_aa_sequence += DNA_TO_AMINO_ACID[single_DNA]
+                        for key in result_json[procnum]:
+                            if 7 <= len(current_aa_sequence) < min_seq:
+                                min_seq = len(current_aa_sequence)
+                                result_json[procnum] = {len(current_aa_sequence): current_aa_sequence}
+                            codon_start = False
+                            current_aa_sequence = ''
+                if codon_start:
+                    current_aa_sequence += DNA_TO_AMINO_ACID[single_DNA]
             except NameError as ne:
                 print(ne)
                 print("Sequence:", single_DNA, " doesn't match a known DNA")
@@ -27,25 +41,6 @@ class Logic:
                 print('PID ' + str(procnum) + ' Exception for  single_DNA : ' + str(e))
                 print(traceback.print_tb(e.__traceback__))
         return_dict[procnum] = result_json
-
-    @staticmethod
-    def __convert_dna_to_legal_codon(codon_start, current_aa_sequence, min_seq, procnum, result_json, single_DNA):
-        if DNA_TO_AMINO_ACID[single_DNA] == 'M':
-            # new codon
-            codon_start = True
-        elif DNA_TO_AMINO_ACID[single_DNA] == '*':
-            # to make sure that we already are in a codon
-            if codon_start:
-                # end codon
-                current_aa_sequence += DNA_TO_AMINO_ACID[single_DNA]
-                for key in result_json[procnum]:
-                    if 7 <= len(current_aa_sequence) < min_seq:
-                        min_seq = len(current_aa_sequence)
-                        result_json[procnum] = {len(current_aa_sequence): current_aa_sequence}
-                    codon_start = False
-                    current_aa_sequence = ''
-        if codon_start:
-            current_aa_sequence += DNA_TO_AMINO_ACID[single_DNA]
 
     @staticmethod
     def get_min_seq(return_dict):
