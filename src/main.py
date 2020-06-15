@@ -40,4 +40,4 @@ def run_multiprocess_conversion(file_reader, file_name):
 
 
 if __name__ == "__main__":
-    main('DNA_input.txt')
+    main('l_data')
