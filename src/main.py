@@ -8,7 +8,6 @@ import time
 
 
 def worker(procnum, return_dict, block):
-    # print('PID:' + str(procnum) + " Block data: " + block)
     return Logic.get_aa_codon(procnum, return_dict, block)
 
 
@@ -40,4 +39,4 @@ def run_multiprocess_conversion(file_reader, file_name):
 
 
 if __name__ == "__main__":
-    main('l_data')
+    main('DNA_input.txt')
