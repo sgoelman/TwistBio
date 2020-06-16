@@ -12,7 +12,7 @@ Feature: DNA to AA Converter  tests
     Examples:
       | DNA                                              | Output shortest sequence                            | Output total different combinations | Total amino acid sequences |
 #'XXXXXMPPPMPPPPP*' seq:MPPPPP*
-      | TGCTTATGCCACCACCAATGCCACCACCACCACCATAGA          | is', 'MPPPPP*', 'With the DNA length of', 21        | AA sequence is:', 3072              | 20 DNA letters are:', 2    |
+      | TGCTTATGCCACCACCAATGCCACCACCACCACCATAG           | is', 'MPPPPP*', 'With the DNA length of', 21        | AA sequence is:', 3072              | 20 DNA letters are:', 2    |
 #Random chars:
       | XCVxszdgvfg2354987                               | is', None, 'With the DNA length of', 0              | AA sequence is:', None              | 20 DNA letters are:', 0    |
 #MSAHARBEEBWRK*555:
@@ -20,7 +20,7 @@ Feature: DNA to AA Converter  tests
 #MHISAHAR*****:
       | ATGCATATCAGCGCGCACGCCCGATGATGATGATGATGA          | is', 'MHISAHAR*', 'With the DNA length of', 27      | AA sequence is:', 20736             | 20 DNA letters are:', 1    |
 #Many start codon in a seq,  !!!!!!MMMHISAHAR*M:
-      | !!!!!!ATGATGATGCATATCAGCGCGCACGCCCGATGAATG       | is', 'MHISAHAR*', 'With the DNA length of', 27    | AA sequence is:', 20736             | 20 DNA letters are:', 3    |
+      | !!!!!!ATGATGATGCATATCAGCGCGCACGCCCGATGAATG       | is', 'MHISAHAR*', 'With the DNA length of', 27      | AA sequence is:', 20736             | 20 DNA letters are:', 3    |
 #legal but with numbers instead of DNA letters , M1234567*:
       | ATG1234567TGA                                    | is', None, 'With the DNA length of', 0              | AA sequence is:', None              | 20 DNA letters are:', 0    |
 #shorter then 20, MH*:
@@ -28,7 +28,6 @@ Feature: DNA to AA Converter  tests
 #check that the shortest seq is being returned, MHISAHAR* MSAHAR*
       | ATGCATATCAGCGCGCACGCCCGATGAATGAGCGCGCACGCCCGATGA | is', 'MSAHAR*', 'With the DNA length of', 21        | AA sequence is:', 3456              | 20 DNA letters are:', 2    |
 
-# todo:   MCAQBTPQKBMCVCAPLFFSQBTLSLSHM*
-#"TAA": "*", "TAG": "*", "TGA": "*"
-#"ATG": "M",
-#  "CCA": "P",
+
+
+
