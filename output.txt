@@ -1,2 +1,3 @@
 ('The shortest amino acid sequence with a minimum of 20 DNA letters is', 'MSAHAR*', 'With the DNA length of', 21)
 ('The total different DNA sequences that can be back-translated from the AA sequence is:', 3456)
+('The total number of amino acid sequences that  are over 20 DNA letters are:', 2)

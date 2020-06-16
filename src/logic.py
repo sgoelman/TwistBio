@@ -5,26 +5,30 @@ from src.DNA_to_amino_acid import DNA_TO_AMINO_ACID, AMINO_ACID_TO_DNA
 class Logic:
 
     def __init__(self):
+        self.all_aa_over_20 = []
         self.DNAtoAA = DNA_TO_AMINO_ACID
         self.AMINO_ACID_TO_DNA = AMINO_ACID_TO_DNA
-        self.amino_acid_output = None
         self.back_translated_list = []
-        self.min_seq_length = math.inf
+        self.amino_acid_output = None
 
     def write_output(self, total_combinations):
         """
         writes the shortest amino acid sequence with a minimum of 20 DNA letters and the  total different DNA
         sequences that can be back-translated from this sequence :rtype: void
         """
-        if self.min_seq_length == math.inf:
-            self.min_seq_length = 0
-        convert_to_AA_output_text = 'The shortest amino acid sequence with a minimum of 20 DNA letters is', self.amino_acid_output, 'With the DNA length of', self.min_seq_length * 3
+        min_aa_length = 0
+        aa_count = 0
+        if self.amino_acid_output:
+            min_aa_length = len(self.amino_acid_output) * 3
+            aa_count = len(self.all_aa_over_20)
+        convert_to_AA_output_text = 'The shortest amino acid sequence with a minimum of 20 DNA letters is', self.amino_acid_output, 'With the DNA length of', min_aa_length
         convert_to_DNA_output_text = 'The total different DNA sequences that can be back-translated from the AA sequence is:', total_combinations
-
+        total_AA_over_20 = 'The total number of amino acid sequences that  are over 20 DNA letters are:', aa_count
         with open('output.txt', 'a') as the_file:
             the_file.truncate(0)
             the_file.write(repr(convert_to_AA_output_text) + '\n')
             the_file.write(repr(convert_to_DNA_output_text) + '\n')
+            the_file.write(repr(total_AA_over_20) + '\n')
             the_file.close()
 
     def get_min_aa(self, input_data, is_input_in_file=True):
@@ -33,57 +37,58 @@ class Logic:
         :rtype: void
         """
         data = self.__replace_backslash_n(input_data, is_input_in_file)
-        data = self.__fix_input(data)
-        # gets min amino acid min values final value is the min or equal to the min
-        for x in self.get_aa_codon(data):
-            self.amino_acid_output = x
+        self.get_aa_codons(data)
+        print("all amino acid over 20:" + str(self.all_aa_over_20))
+        print("Count all amino acid over twenty:" + str(len(self.all_aa_over_20)))
+        if self.all_aa_over_20:
+            self.amino_acid_output = min(self.all_aa_over_20, key=len)
 
-    def get_aa_codon(self, data):
+        # gets min amino acid min values final value is the min or equal to the min
+
+    def get_aa_codons(self, data):
         """
         method will get all min amino acid codons - final codons is with min length
         :rtype: str
         """
-        codon_start = False
-        current_aa_sequence = ''
-        # big for loop for all data , jumps by 3
-        for i in range(0, len(data), 3):
-            single_DNA = data[i:i + 3]
+        # big whlie loop for all data ,
+        i = 0
+        while i < len(data):
+            #  jumps by 1
+            three_chars = data[i:i + 3]
             try:
-                codon_start, current_aa_sequence = yield from self.__convert_dna_to_legal_codon(codon_start,
-                                                                                                current_aa_sequence,
-                                                                                                single_DNA)
-                if codon_start:
-                    # add AA to codon
-                    current_aa_sequence += self.DNAtoAA[single_DNA]
+                if self.DNAtoAA[three_chars] == 'M':
+                    # inside a codon
+                    k = self.__find_codons(data, i)
+                    i = k + i
+                else:
+                    i = i + 1
             except NameError as ne:
+                i = i + 1
                 print(ne)
-                print("Sequence:", single_DNA, " doesn't match a known DNA")
+                print("Sequence:", three_chars, " doesn't match a known DNA")
                 continue
             except Exception as e:
                 print(e)
+                i = i + 1
+                continue
 
-    def __fix_input(self, data):
-        while len(data) % 3 != 0:
-            print("Error input DNA does not divide by 3 , will remove final char and try again")
-            data = data[:-1]
-        return data
-
-    def __convert_dna_to_legal_codon(self, codon_start, current_aa_sequence, single_DNA):
-        if self.DNAtoAA[single_DNA] == 'M':
-            # new codon
-            codon_start = True
-        elif self.DNAtoAA[single_DNA] == '*':
-            # to make sure that we already are in a codon
-            if codon_start:
+    def __find_codons(self, data, i):
+        """
+        need to call method when inside a codon
+        :param data: all input data
+        :param i: global while iterator
+        :return: void
+        """
+        current_aa_sequence = ''
+        for i in range(i, len(data), 3):
+            #  jumps by 3
+            single_DNA = data[i:i + 3]
+            current_aa_sequence += self.DNAtoAA[single_DNA]
+            if self.DNAtoAA[single_DNA] == '*':
                 # end codon *
-                current_aa_sequence += self.DNAtoAA[single_DNA]
-                # shortest sequence with a minimum of 20 DNA (7 AA)
-                if 7 <= len(current_aa_sequence) <= self.min_seq_length:
-                    self.min_seq_length = len(current_aa_sequence)
-                    yield current_aa_sequence
-                codon_start = False
-                current_aa_sequence = ''
-        return codon_start, current_aa_sequence
+                if 7 <= len(current_aa_sequence):
+                    self.update_all_codons_in_aa_seq(current_aa_sequence)
+                return i
 
     def convert_back_to_DNA(self):
         """
@@ -106,3 +111,10 @@ class Logic:
             return data
         else:
             return input_dna_seq
+
+    def update_all_codons_in_aa_seq(self, current_aa_sequence):
+        # reveres the string and then gets the position of all Ms
+        m_position = [pos for pos, char in enumerate(current_aa_sequence[::-1]) if char == 'M']
+        for i in m_position:
+            if i >= 6:
+                self.all_aa_over_20.append(current_aa_sequence[-i - 1:])

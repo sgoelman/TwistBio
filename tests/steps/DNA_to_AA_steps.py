@@ -11,7 +11,7 @@ def step_impl(context):
     pass
 
 
-@when('I convert DNA to amino acid translation on "(?P<DNA>.+)" I should')
+@when('I convert DNA:"(?P<DNA>.+)" to amino acid')
 def step_impl(context, DNA):
     """
     :type context: behave.runner.Context
@@ -21,7 +21,6 @@ def step_impl(context, DNA):
     logic.get_min_aa(DNA, False)
     total_combinations = logic.convert_back_to_DNA()
     logic.write_output(total_combinations)
-    print("Test conversion result:" + str(logic.amino_acid_output) + str(logic.min_seq_length))
 
 
 @step('I validate that I receive the correct "(.+)"')
