@@ -26,9 +26,11 @@ class Logic:
         total_AA_over_20 = 'The total number of amino acid sequences that  are over 20 DNA letters are:', aa_count
         with open('output.txt', 'a') as the_file:
             the_file.truncate(0)
-            the_file.write(repr(convert_to_AA_output_text) + '\n')
-            the_file.write(repr(convert_to_DNA_output_text) + '\n')
-            the_file.write(repr(total_AA_over_20) + '\n')
+            # the_file.write(repr(convert_to_AA_output_text) + '\n')
+            # the_file.write(repr(convert_to_DNA_output_text) + '\n')
+            # the_file.write(repr(total_AA_over_20) + '\n')
+            for seq in self.all_aa_over_20:
+                the_file.write(repr(seq) + '\n')
             the_file.close()
 
     def get_min_aa(self, input_data, is_input_in_file=True):
