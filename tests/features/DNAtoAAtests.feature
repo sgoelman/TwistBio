@@ -37,7 +37,7 @@ Feature: DNA to AA Converter  tests
     And I validate that I receive the correct "<Total amino acid sequences>"
     Examples:
       | DNA                                                                                     | Total amino acid sequences |
-      | TAGATGCCACCACCACCACCATAGTAGTAGTAGATGCCACCACCACCACCATAGCCACCAATGATGCCACCACCAATGCCACCATAG | 20 DNA letters are:', 9    |
+      | TAGATGCCACCACCACCACCATAGTAGTAGTAGATGCCACCACCACCACCATAGCCACCAATGATGCCACCACCAATGCCACCATAG | 20 DNA letters are:', 10    |
 #      | ATGCCACCACCACCACCATAGCCACCAATGATGCCACCACCAATGCCACCATAG                               | 20 DNA letters are:', 54   |
 #      | ATGATGCCACCACCAATGCCACCATAG                                                          | 20 DNA letters are:', 27   |
 #      | ATGCCACCACCAATGCCACCATAG                                                             | 20 DNA letters are:', 8   |
