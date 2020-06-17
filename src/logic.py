@@ -50,6 +50,7 @@ class Logic:
         method will get all min amino acid codons - final codons is with min length
         :rtype: str
         """
+        # TGCTTA
         # big whlie loop for all data ,
         i = 0
         while i < len(data):
@@ -60,7 +61,7 @@ class Logic:
                     # inside a codon
                     k = self.__find_codons(data, i)
                     if k:
-                        i = k
+                        i += 1
                     else:
                         # Reached end of file
                         break
@@ -94,7 +95,6 @@ class Logic:
                     # end codon *
                     if 7 <= len(current_aa_sequence):
                         self.update_all_codons_in_aa_seq(current_aa_sequence)
-                    return k
             else:
                 print('End of file')
 
