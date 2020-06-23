@@ -29,7 +29,7 @@ Feature: DNA to AA Converter  tests
 #      | ATGCATATCAGCGCGCACGCCCGATGAATGAGCGCGCACGCCCGATGA                                        | is', 'MSAHAR*', 'With the DNA length of', 21        | AA sequence is:', 3456              | 20 DNA letters are:', 2    |
 ##seq:!*MPPPPP****MPPPPP*PP!!MMPPMPPP*!
 #      | TAGATGCCACCACCACCACCATAGTAGTAGTAGATGCCACCACCACCACCATAGCCACCAATGATGCCACCACCAATGCCACCATAG | is', 'MPPPPP*', 'With the DNA length of', 21        | AA sequence is:', 3072              | 20 DNA letters are:', 4    |
-
+#
 
   Scenario Outline: Validate that I will receive correct errors with illegal DNA sequence
     Given I am logged in to application
@@ -37,10 +37,10 @@ Feature: DNA to AA Converter  tests
     And I validate that I receive the correct "<Total amino acid sequences>"
     Examples:
       | DNA                                                                                     | Total amino acid sequences |
-      | TAGATGCCACCACCACCACCATAGTAGTAGTAGATGCCACCACCACCACCATAGCCACCAATGATGCCACCACCAATGCCACCATAG | 20 DNA letters are:', 10    |
-#      | ATGCCACCACCACCACCATAGCCACCAATGATGCCACCACCAATGCCACCATAG                               | 20 DNA letters are:', 54   |
-#      | ATGATGCCACCACCAATGCCACCATAG                                                          | 20 DNA letters are:', 27   |
-#      | ATGCCACCACCAATGCCACCATAG                                                             | 20 DNA letters are:', 8   |
+      | TAGATGCCACCACCACCACCATAGTAGTAGTAGATGCCACCACCACCACCATAGCCACCAATGATGCCACCACCAATGCCACCATAG | 20 DNA letters are:', 10   |
+      | ATGCCACCACCACCACCATAGCCACCAATGATGCCACCACCAATGCCACCATAG                                  | 20 DNA letters are:', 4    |
+      | ATGATGCCACCACCAATGCCACCATAG                                                             | 20 DNA letters are:', 2    |
+      | ATGCCACCACCAATGCCACCATAG                                                                | 20 DNA letters are:', 1    |
 
 #  6 +2 +2
 #"TAA": "*", "TAG": "*", "TGA": "*"}

@@ -26,11 +26,12 @@ class Logic:
         total_AA_over_20 = 'The total number of amino acid sequences that  are over 20 DNA letters are:', aa_count
         with open('output.txt', 'a') as the_file:
             the_file.truncate(0)
-            # the_file.write(repr(convert_to_AA_output_text) + '\n')
-            # the_file.write(repr(convert_to_DNA_output_text) + '\n')
-            # the_file.write(repr(total_AA_over_20) + '\n')
-            for seq in self.all_aa_over_20:
-                the_file.write(repr(seq) + '\n')
+            the_file.write(repr(convert_to_AA_output_text) + '\n')
+            the_file.write(repr(convert_to_DNA_output_text) + '\n')
+            the_file.write(repr(total_AA_over_20) + '\n')
+            # print all aa over 20
+            # for seq in self.all_aa_over_20:
+            #     the_file.write(repr(seq) + '\n')
             the_file.close()
 
     def get_min_aa(self, input_data, is_input_in_file=True):
@@ -40,7 +41,7 @@ class Logic:
         """
         data = self.__replace_backslash_n(input_data, is_input_in_file)
         self.get_aa_codons(data)
-        print("all amino acid over 20:" + str(self.all_aa_over_20))
+        # print("all amino acid over 20:" + str(self.all_aa_over_20))
         print("Count all amino acid over twenty:" + str(len(self.all_aa_over_20)))
         if self.all_aa_over_20:
             self.amino_acid_output = min(self.all_aa_over_20, key=len)
